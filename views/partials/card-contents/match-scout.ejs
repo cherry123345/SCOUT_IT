@@ -1,0 +1,136 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<p class="card-title" id="matchNo"></p>
+<label for="SpeakerNotes">SpeakerNotes:</label>
+<input type="number" id="speakerNotes" readonly placeholder="">
+<label for="AmpNotes">AmpNotes:</label>
+<input type="number" id="ampNotes" readonly placeholder="">
+<label for="PassedNotes">PassedNotes:</label>
+<input type="number" id="passedNotes" readonly placeholder="">
+<label for="autoNotes">AutoNotes:</label>
+<input type="number" id="autoNotes" readonly placeholder="">
+<label for="climb">Climb:</label>
+<select id="climb" disabled>
+    <option id="climb-placeholder" value="" selected disabled></option>
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+</select>
+<label for="trap">Trap:</label>
+<select id="trap" disabled>
+    <option id="trap-placeholder" value="" selected disabled></option>
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+</select>
+<label for="WinLoss">Win/Loss:</label>
+<select id="winloss" disabled>
+    <option id="winloss-placeholder" value="" selected disabled></option>
+    <option value="Win">Win</option>
+    <option value="Loss">Loss</option>
+</select>
+<label for="AdditionalNotes">Additional Notes:</label>
+<input type="text" id="additionalnotes" readonly placeholder="">
+<div class="modal-btn">
+    <% if (user && (user.roles === 'admin' || user.roles === 'scout' || user.roles === 'scoutlead')) { %>
+        <button id="matchEditButton" class="edit-button">Edit</button>
+        <button id="matchSaveButton" class="save-button" style="display:none;">Save</button>
+    <% } %>
+</div>  
+<p id="lastmodified" class="last-updated"></p>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editButton = document.getElementById('matchEditButton');
+        const saveButton = document.getElementById('matchSaveButton');
+        const modal = document.getElementById('robotModal');
+        const scoutSelect = document.getElementById('scout-select');
+        
+
+        const matchfields = {
+            SpeakerNotes: document.getElementById('speakerNotes'),
+            AmpNotes: document.getElementById('ampNotes'),
+            PassedNotes: document.getElementById('passedNotes'),
+            AutoNotes: document.getElementById('autoNotes'),
+            Climb: document.getElementById('climb'),
+            Trap: document.getElementById('trap'),
+            WinLoss: document.getElementById('winloss'),
+            AdditionalNotes: document.getElementById('additionalnotes')
+        };
+
+        if(editButton) {
+            editButton.addEventListener('click', () => {
+                Object.keys(matchfields).forEach(key => {
+                    matchfields[key].disabled = false; // Make fields editable
+                    matchfields[key].readOnly = false;
+                });
+                editButton.style.display = 'none';
+                saveButton.style.display = 'inline-block';
+            });
+        }
+
+        if(saveButton) {
+            saveButton.addEventListener('click', async () => {
+                const matchNo = scoutSelect.value;
+                const teamNum = scoutSelect.getAttribute('data-team-num');
+                const updatedData = {};
+
+                Object.keys(matchfields).forEach(key => {
+                    updatedData[key] = matchfields[key].value;
+                });
+
+                try {
+                    const response = await fetch(`/matchupdate/${teamNum}/${matchNo}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: result.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        Object.keys(matchfields).forEach(key => {
+                            matchfields[key].disabled = true; // Make fields editable
+                            matchfields[key].readOnly = true;
+                        });
+                        editButton.style.display = 'inline-block';
+                        saveButton.style.display = 'none';
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: result.message,
+                            confirmButtonText: 'OK'
+                        });
+                        Object.keys(matchfields).forEach(key => {
+                            matchfields[key].disabled = true; // Make fields editable
+                            matchfields[key].readOnly = true;
+                        });
+                        editButton.style.display = 'inline-block';
+                        saveButton.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while updating.',
+                        confirmButtonText: 'OK'
+                    });
+                    Object.keys(matchfields).forEach(key => {
+                            matchfields[key].disabled = true; // Make fields editable
+                            matchfields[key].readOnly = true;
+                        });
+                    editButton.style.display = 'inline-block';
+                    saveButton.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>

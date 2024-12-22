@@ -1,0 +1,200 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<label for="modalWeight">Weight (LB):</label>
+<input type="number" id="modalWeight" readonly placeholder="">
+<label for="modalFrameSize">Frame Size (with bumpers):</label>
+<input type="text" id="modalFrameSize" readonly placeholder="">
+<label for="modalDrivetrain">Drivetrain:</label>
+<select id="modalDrivetrain" disabled>
+    <option id="drivetrain-placeholder" value="" selected disabled></option>
+    <option value="Swerve">Swerve</option>
+    <option value="Tank">Tank</option>
+</select>
+<label for="modalScorePlace">Score Place:</label>
+<select id="modalScorePlace" disabled>
+    <option id="scoreplace-placeholder" value="" selected disabled></option>
+    <option value="Amp">Amp</option>
+    <option value="Speaker">Speaker</option>
+    <option value="Both">Both</option>
+</select>
+<label for="modalAdjustableShooter">Adjustable Shooter:</label>
+<select id="modalAdjustableShooter" disabled>
+    <option id="adjustabeshooter-placeholder" value="" selected disabled></option>
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+</select>
+<label for="modalClimbAndTrap">Climb and Trap:</label>
+<select id="modalClimbAndTrap" disabled>
+    <option id="climbandtrap-placeholder" value="" selected disabled></option>
+    <option value="Climb">Climb</option>
+    <option value="Trap">Trap</option>
+    <option value="Both">Both</option>
+</select>
+<label for="modalAutoStrats">Auto strategy:</label>
+<input type="text" id="modalAutoStrats"  readonly placeholder="">
+<label for="modalSpecialfeaturesAndLimitations">Special Features and Limitations:</label>
+<input type="text" id="modalSpecialfeaturesAndLimitations"  readonly placeholder="">
+<div class="modal-btn">
+    <% if (user && (user.roles === 'admin' || user.roles === 'scout' || user.roles === 'scoutlead')) { %>
+        <button id="editButton" class="edit-button">Edit</button>
+        <button id="saveButton" class="save-button" style="display:none;">Save</button>
+    <% } %>
+    <% if (user && (user.roles === 'admin' || user.roles === 'scoutlead')) { %>
+        <button id="deleteButton" class="delete-button">Delete</button>
+    <% } %>
+</div>    
+<p id="lastUpdated" class="last-updated"></p>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editButton = document.getElementById('editButton');
+        const saveButton = document.getElementById('saveButton');
+        const deleteButton = document.getElementById('deleteButton');
+        const modal = document.getElementById('robotModal');
+
+        const inputFields = {
+            Weight: document.getElementById('modalWeight'),
+            FrameSize: document.getElementById('modalFrameSize'),
+            Drivetrain: document.getElementById('modalDrivetrain'),
+            ScorePlace: document.getElementById('modalScorePlace'),
+            AdjustableShooter: document.getElementById('modalAdjustableShooter'),
+            ClimbAndTrap: document.getElementById('modalClimbAndTrap'),
+            AutoStrats: document.getElementById('modalAutoStrats'),
+            SpecialfeaturesAndLimitations: document.getElementById('modalSpecialfeaturesAndLimitations')
+        };
+        
+        if(editButton){
+            editButton.addEventListener('click', () => {
+                Object.keys(inputFields).forEach(key => {
+                    inputFields[key].disabled = false; // Make fields editable
+                    inputFields[key].readOnly = false;
+                });
+                editButton.style.display = 'none';
+                saveButton.style.display = 'inline-block';
+            });
+        }
+
+        if(saveButton){
+            saveButton.addEventListener('click', async () => {
+                const teamNum = saveButton.getAttribute('data-team-num');
+                const updatedData = {};
+
+                Object.keys(inputFields).forEach(key => {
+                    updatedData[key] = inputFields[key].value;
+                });
+
+                try {
+                    const response = await fetch(`/update/${teamNum}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                       // Show success alert
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: result.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        Object.keys(inputFields).forEach(key => {
+                            inputFields[key].disabled = true; // Make fields editable
+                            inputFields[key].readOnly = true;
+                        });
+                        editButton.style.display = 'inline-block';
+                        saveButton.style.display = 'none';
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: result.message,
+                            confirmButtonText: 'OK'
+                        });
+                        Object.keys(inputFields).forEach(key => {
+                            inputFields[key].disabled = true; // Make fields editable
+                            inputFields[key].readOnly = true;
+                        });
+                        editButton.style.display = 'inline-block';
+                        saveButton.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Internal server error',
+                        confirmButtonText: 'OK'
+                    });
+                    Object.keys(inputFields).forEach(key => {
+                        inputFields[key].disabled = true; // Make fields editable
+                        inputFields[key].readOnly = true;
+                    });
+                    editButton.style.display = 'inline-block';
+                    saveButton.style.display = 'none';
+                }
+            });
+        }
+
+        if(deleteButton) {
+            deleteButton.addEventListener('click', async () => {
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!"
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const teamNum = deleteButton.getAttribute('data-team-num');
+                        try {
+                            const response = await fetch(`/delete/${teamNum}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            const result = await response.json();
+                            if (response.ok) {
+                                // Show success alert
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: result.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    location.reload(); // Optionally reload the page to reflect the deletion
+                                });
+                            } else {
+                                // Show error alert
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: result.message,
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while deleting.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    }
+                });
+            });
+        }
+    });
+</script>

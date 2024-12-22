@@ -1,0 +1,240 @@
+/* Modal styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  margin-top: auto;
+  padding-top: 15px;
+  overflow: auto;
+}
+
+.modal.show {
+  display: flex; /* Center content using flexbox */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+}
+  
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin:  auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  max-width: 500px; /* Limit the maximum width */
+  border-radius: 10px; /* Rounded corners */
+  overflow: auto;
+}
+
+.modal-content p {
+  padding-bottom: 10px;
+}
+
+/* Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.changeImage-button {
+  background-color: rgb(255, 112, 17);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-family: "Chakra Petch", sans-serif;
+  margin-bottom: 10px;
+  margin-left: 20px;
+}
+
+.changeImage-button:hover {
+  background-color: rgb(239, 212, 179);
+}
+
+.delete-button {
+  background-color: rgb(205, 18, 18);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-family: "Chakra Petch", sans-serif;
+  margin-left: 30px;
+}
+
+.delete-button:hover {
+  background-color: rgb(255, 0, 0);
+}
+
+.edit-button {
+  background-color: rgb(20, 138, 24);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-family: "Chakra Petch", sans-serif;
+}
+
+.edit-button:hover {
+  background-color: rgb(53, 186, 13);
+}
+
+.save-button {
+  background-color: rgb(20, 138, 24);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: rgb(53, 186, 13);
+}
+
+.modal-btn {
+  padding-top: 10px;
+}
+
+.update-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: "Share Tech Mono", monospace;
+}
+
+.contents {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contents select {
+  width: 100%;
+  height: auto; /* Adjust height as needed */
+  overflow-y: scroll;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.card-title {
+  font-family: "Chakra Petch", sans-serif;
+  text-transform: uppercase;
+}
+
+/* New styles for header */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-header h2 {
+  margin: 0;
+}
+
+.card-header select {
+  width: 100px; /* Set desired width */
+  padding: 7px; /* Adjust padding */
+  border-radius: 5px;
+  margin-bottom: 10px;
+  margin-left: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+
+/* 1 card per row */
+@media (max-width: 576px) {
+  .card-header select{
+    margin-left: 1px; /* Reduced margin */ /* 100% width minus margin for 1 card per row */
+    margin-right: 0;
+  }
+
+  .card-header {
+    gap: 5px;
+  }
+
+  .changeImage-button {
+    border: none;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+  }
+
+}
+
+
+
+/* For all readonly inputs */
+input[readonly] {
+    color: #000000 !important; 
+    border: 1px solid #ccc !important;
+    background-color: #e1e1e1 !important; 
+    font-family: "Chakra Petch", sans-serif;
+    font-size:small;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+input {
+  color: #000000 !important; 
+  border: 1px solid #ccc !important;
+  background-color: #ffffff !important; 
+  font-family: "Chakra Petch", sans-serif;
+  font-size:small;
+  text-transform: uppercase;
+}
+
+/* Increase specificity by including an ID or class */
+#modalDrivetrain:disabled, 
+#modalScorePlace:disabled, 
+#modalAdjustableShooter:disabled, 
+#modalClimbAndTrap:disabled,
+#trap:disabled,
+#climb:disabled,
+#winloss:disabled {
+    color: #000000 !important; 
+    background-color: #e1e1e1 !important; 
+    font-family: "Chakra Petch", sans-serif;
+    font-size: small;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+
+#modalDrivetrain, 
+#modalScorePlace, 
+#modalAdjustableShooter, 
+#modalClimbAndTrap,
+#trap,
+#climb,
+#winloss {
+    color: #000000 !important; 
+    background-color: #ffffff !important; 
+    font-family: "Chakra Petch", sans-serif;
+    font-size: small;
+    text-transform: uppercase;
+}
+
